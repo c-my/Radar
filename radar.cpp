@@ -20,12 +20,6 @@ Radar::Radar(QWidget *parent) : QWidget(parent)
     Point p;
     p.angle = 45;
     p.dis = 20;
-    pointList.push_back(p);
-    pointList.push_back({46,30});
-    pointList.push_back({47,30});
-    pointList.push_back({90,40});
-    pointList.push_back({135,50});
-
 
     baseRadius = 500;
 
@@ -75,17 +69,20 @@ void Radar::paintEvent(QPaintEvent *)
     // draw target
     painter.setPen(QPen(Qt::red));
     painter.setBrush(QBrush(Qt::red));
-    for(auto p : pointList)
+    for(int i = 0; i < 256; i++)
     {
-        double x = lefttop + baseRadius/2 + p.dis*qCos(qDegreesToRadians(p.angle));
-        double y = lefttop + baseRadius/2 - p.dis*qSin(qDegreesToRadians(p.angle));
+        double angle = i;
+        double dis = distances[i];
+        double x = lefttop + baseRadius / 2 + dis*qCos(qDegreesToRadians(angle));
+        double y = lefttop + baseRadius / 2 - dis*qSin(qDegreesToRadians(angle));
+        // qDebug() << "draw point: " << x << " " << y;
         painter.drawPoint(int(x), int(y));
         painter.drawEllipse(int(x), int(y), 5, 5);
     }
 }
 
-void Radar::getPos(double ang, double dis)
+void Radar::getPos(int ang, int dis)
 {
-    pointList.push_back({ang,dis});
+    distances[ang] = dis;
     update();
 }

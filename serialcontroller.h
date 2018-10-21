@@ -23,7 +23,7 @@ private:
 
 
 signals:
-    void sendPos(double angle, double dis);
+    void sendPos(int angle, int dis);
     void openSuccess();
     void openFailed();
     void closeSuccess();
