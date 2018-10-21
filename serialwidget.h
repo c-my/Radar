@@ -37,7 +37,7 @@ signals:
     void changeRTS(bool set);
     void changeDTR(bool set);
 
-    void deliverPos(double ang,double dis);
+    void deliverPos(int ang,int dis);
 
 public slots:
     void serialOpened();           //串口打开成功

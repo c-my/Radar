@@ -1,14 +1,15 @@
 #include "serialcontroller.h"
+#include <QDebug>
 
 SerialController::SerialController(QObject *parent) : QObject(parent)
 {
     serial = new QSerialPort(this);
     connect(serial, SIGNAL(readyRead()), this,SLOT(handleRecv()));
 
-    QList<QSerialPortInfo> SerialList = QSerialPortInfo::availablePorts();
-    if(SerialList.size()!=0){
-        openSerial(SerialList[0].portName());
-    }
+//     QList<QSerialPortInfo> SerialList = QSerialPortInfo::availablePorts();
+//    if(SerialList.size()!=0){
+//        openSerial(SerialList[0].portName());
+//    }
 //    testAng = 0;
 //    testWise=  false;
 
@@ -23,6 +24,7 @@ SerialController::SerialController(QObject *parent) : QObject(parent)
 
 void SerialController::openSerial(QString name)
 {
+    qDebug() << name;
     serial->setPortName(name);
     if (serial->open(QIODevice::ReadWrite))
     {
@@ -36,7 +38,7 @@ void SerialController::openSerial(QString name)
     {
         //串口打开失败
         emit openFailed();
-
+        qDebug() << serial->error();
     }
 }
 
@@ -85,7 +87,15 @@ void SerialController::handleRecv()
 {
     QByteArray data = serial->readAll();
     QString str = data;
-    emit sendPos(str.split("|")[0].toDouble(),str.split("|")[1].toDouble());
+    double a, d;
+    try {
+        QStringList sl = str.split("|");
+        a = sl[0].toInt();
+        d = sl[0].toInt();
+        emit sendPos(a, d);
+    } catch(...) {
+        ;
+    }
 }
 
 void SerialController::contrloRTS(bool set)

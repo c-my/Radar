@@ -21,7 +21,7 @@ private:
         double dis;
     };
 
-    QVector<Point> pointList;
+    int distances[256] = {0};
 
     QTimer scanTimer;
     int lefttop;
@@ -36,10 +36,10 @@ private:
 
 
 signals:
-    void sendPos(double ang, double dis);
+    void sendPos(int ang, int dis);
 
 public slots:
-    void getPos(double ang, double dis);
+    void getPos(int ang, int dis);
 };
 
 #endif // RADAR_H

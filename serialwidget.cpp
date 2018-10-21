@@ -8,21 +8,21 @@ SerialWidget::SerialWidget(QWidget *parent) : QWidget(parent)
     serialController = new SerialController;
     serialController->moveToThread(&SerialThr);
     SerialThr.start();
-
-    BaudrateList << "256000"
-                 << "230400"
-                 << "128000"
-                 << "115200"
-                 << "76800"
-                 << "57600"
-                 << "43000"
-                 << "38400"
-                 << "19200"
-                 << "14400"
-                 << "9600"
-                 << "4800"
-                 << "2400"
-                 << "1200";
+      BaudrateList << "115200";
+//    BaudrateList << "256000"
+//                 << "230400"
+//                 << "128000"
+//                 << "115200"
+//                 << "76800"
+//                 << "57600"
+//                 << "43000"
+//                 << "38400"
+//                 << "19200"
+//                 << "14400"
+//                 << "9600"
+//                 << "4800"
+//                 << "2400"
+//                 << "1200";
     StopbitsList << "1"
                  << "1.5"
                  << "2";
@@ -248,7 +248,7 @@ void SerialWidget::ACtionAttachToSerial(bool set)
     {
         OpenButton->setText(tr("关闭串口"));
         COMBox->setDisabled(true);
-        SendButton->setDisabled(false);
+        //SendButton->setDisabled(false);
         disconnect(OpenButton, &QPushButton::clicked, this, &SerialWidget::OpenSerial);
         connect(OpenButton, &QPushButton::clicked, this, &SerialWidget::CloseSerial);
     }
@@ -256,7 +256,7 @@ void SerialWidget::ACtionAttachToSerial(bool set)
     {
         OpenButton->setText(tr("打开串口"));
         COMBox->setDisabled(false);
-        SendButton->setDisabled(true);
+        //SendButton->setDisabled(true);
         disconnect(OpenButton, &QPushButton::clicked, this, &SerialWidget::CloseSerial);
         connect(OpenButton, &QPushButton::clicked, this, &SerialWidget::OpenSerial);
     }
