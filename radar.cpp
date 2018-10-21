@@ -23,9 +23,6 @@ Radar::Radar(QWidget *parent) : QWidget(parent)
 
     baseRadius = 500;
 
-//    serial = new SerialController;
-//    serial->moveToThread(&SerialThr);
-//    SerialThr.start();
     connect(&scanTimer,&QTimer::timeout, this, [this](){
        currentAngle++;
        this->update();
@@ -73,6 +70,7 @@ void Radar::paintEvent(QPaintEvent *)
     {
         double angle = i;
         double dis = distances[i];
+//        qDebug()<<dis;
         double x = lefttop + baseRadius / 2 + dis*qCos(qDegreesToRadians(angle));
         double y = lefttop + baseRadius / 2 - dis*qSin(qDegreesToRadians(angle));
         // qDebug() << "draw point: " << x << " " << y;

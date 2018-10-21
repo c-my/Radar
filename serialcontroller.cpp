@@ -87,11 +87,13 @@ void SerialController::handleRecv()
 {
     QByteArray data = serial->readAll();
     QString str = data;
-    double a, d;
+    int a, d;
     try {
+        qDebug()<<str;
         QStringList sl = str.split("|");
         a = sl[0].toInt();
-        d = sl[0].toInt();
+        d = sl[1].toInt();
+        qDebug()<<a<<","<<d;
         emit sendPos(a, d);
     } catch(...) {
         ;
