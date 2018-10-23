@@ -14,7 +14,10 @@
 #include <QTimer>
 #include <QMessageBox>
 #include <QThread>
+#include <QLineEdit>
 #include "serialcontroller.h"
+#include "radar.h"
+#include "waveform.h"
 
 class SerialWidget : public QWidget
 {
@@ -33,19 +36,21 @@ signals:
     void setStopBits(QString stopbits);
     void setDataBits(QString databits);
     void setParity(QString parity);
-    //  void sendData(QString content);
+    void sendData(QString content);
     void changeRTS(bool set);
     void changeDTR(bool set);
 
     void deliverPos(int ang,int dis);
+    void sendSoundSpeed(double s);
 
 public slots:
     void serialOpened();           //串口打开成功
     void serialNotOpened();        //串口打开失败
     void serialClosed();           //串口关闭
-    void getRecv(double ang,double dis); //串口接受数据
+    void getRecv(int ang, int dis); //串口接受数据
     void OpenSerial();
     void CloseSerial();
+    void Calibrate();
     //  void ClearRecv();
     //  void ClearSend();
     //  void detNewLine(int state); //处理发送新行
@@ -62,12 +67,12 @@ private:
     QStringList COMList, PortNameList, DescList;
     QLabel *COMLabel, *BaudrateLabel, *StopbitsLabel, *DatabitsLabel, *ParityLabel;
     QCheckBox *RTSBox, *DTRBox;
-    //  QGridLayout *centralLayout;
     QVBoxLayout *cvlayout;
     QHBoxLayout *bottomLayout;
     QFormLayout *leftLlayout;
+    QLineEdit *sendArea;
     //  QTextEdit *RecvArea, *SendArea;
-    QPushButton *OpenButton, *SendButton;
+    QPushButton *OpenButton, *SendButton, *calibrationButton;
     QTimer *CheckTimer;
     SerialController *serialController;
     QThread SerialThr;
@@ -76,6 +81,9 @@ private:
     bool isSendHex = false;
     bool isRecvHex = false;
     bool isOpened = false;
+
+    Radar *radar;
+    Waveform *wave;
 
     //  QString HexStringToString(QString hexstr); //解码16进制字符串
     void ACtionAttachToSerial(bool set);

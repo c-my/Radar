@@ -6,6 +6,7 @@ SerialController::SerialController(QObject *parent) : QObject(parent)
     serial = new QSerialPort(this);
     connect(serial, SIGNAL(readyRead()), this,SLOT(handleRecv()));
 
+
 //     QList<QSerialPortInfo> SerialList = QSerialPortInfo::availablePorts();
 //    if(SerialList.size()!=0){
 //        openSerial(SerialList[0].portName());
@@ -108,4 +109,14 @@ void SerialController::contrloRTS(bool set)
 void SerialController::controlDTR(bool set)
 {
     serial->setDataTerminalReady(set);
+}
+
+void SerialController::writeData(QString content)
+{
+    if (serial->isWritable())
+    {
+        qint64 result = serial->write(content.toLocal8Bit().data());
+//        if (result == -1);
+//        else;
+    }
 }

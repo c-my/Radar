@@ -4,11 +4,10 @@
 #include <QWidget>
 #include <QPainter>
 #include <QPaintEvent>
-#include <QPalette>
+#include <QPalette>parent
 #include <QtMath>
 #include <QTimer>
 #include <QVector>
-
 class Radar : public QWidget
 {
     Q_OBJECT
@@ -16,12 +15,14 @@ public:
     explicit Radar(QWidget *parent = nullptr);
     void paintEvent(QPaintEvent *);
 private:
-    struct Point{
-        double angle;
-        double dis;
-    };
+
+    inline double convertDis(int dis);
+    int mst;
 
     int distances[256] = {0};
+    int MAX_DIS = 100;
+
+    double soundSpeed;
 
     QTimer scanTimer;
     int lefttop;
@@ -31,7 +32,7 @@ private:
     int currentAngle, lastAngle;
     int currentDistant, lastDistant;
     bool isClock;
-    int baseRadius;
+    int baseDiameter;
 
 
 
@@ -40,6 +41,7 @@ signals:
 
 public slots:
     void getPos(int ang, int dis);
+    void setSoundSpeed(double speed);
 };
 
 #endif // RADAR_H

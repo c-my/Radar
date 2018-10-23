@@ -28,12 +28,14 @@ SOURCES += \
         main.cpp \
     radar.cpp \
     serialcontroller.cpp \
-    serialwidget.cpp
+    serialwidget.cpp \
+    waveform.cpp
 
 HEADERS += \
     radar.h \
     serialcontroller.h \
-    serialwidget.h
+    serialwidget.h \
+    waveform.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

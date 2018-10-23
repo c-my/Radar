@@ -22,6 +22,7 @@ private:
     int testWise;
 
 
+
 signals:
     void sendPos(int angle, int dis);
     void openSuccess();
@@ -37,6 +38,7 @@ public slots:
     void getParity(QString parity);
     void contrloRTS(bool set);
     void controlDTR(bool set);
+    void writeData(QString content);
 };
 
 #endif // SERIALCONTROLLER_H

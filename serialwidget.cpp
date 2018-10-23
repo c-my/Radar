@@ -5,24 +5,32 @@ SerialWidget::SerialWidget(QWidget *parent) : QWidget(parent)
 
     setWindowTitle(tr("Control panel"));
 
+    radar = new Radar();
+    radar->show();
+    connect(this, &SerialWidget::deliverPos, radar, &Radar::getPos);
+
+    wave = new Waveform();
+    wave->show();
+    connect(this, &SerialWidget::deliverPos, wave, &Waveform::getPos);
+
     serialController = new SerialController;
     serialController->moveToThread(&SerialThr);
     SerialThr.start();
-      BaudrateList << "115200";
-//    BaudrateList << "256000"
-//                 << "230400"
-//                 << "128000"
-//                 << "115200"
-//                 << "76800"
-//                 << "57600"
-//                 << "43000"
-//                 << "38400"
-//                 << "19200"
-//                 << "14400"
-//                 << "9600"
-//                 << "4800"
-//                 << "2400"
-//                 << "1200";
+    //      BaudrateList << "115200";
+    BaudrateList << "256000"
+                 << "230400"
+                 << "128000"
+                 << "115200"
+                 << "76800"
+                 << "57600"
+                 << "43000"
+                 << "38400"
+                 << "19200"
+                 << "14400"
+                 << "9600"
+                 << "4800"
+                 << "2400"
+                 << "1200";
     StopbitsList << "1"
                  << "1.5"
                  << "2";
@@ -36,7 +44,7 @@ SerialWidget::SerialWidget(QWidget *parent) : QWidget(parent)
     COMBox = new QComboBox();
     BaudrateBox = new QComboBox();
     BaudrateBox->addItems(BaudrateList);
-    //    BaudrateBox->setCurrentIndex(settings.value("Baud rate", 0).toInt());
+    BaudrateBox->setCurrentIndex(3);
     StopbitsBox = new QComboBox();
     StopbitsBox->addItems(StopbitsList);
     //    StopbitsBox->setCurrentIndex(settings.value("Stop bits", 0).toInt());
@@ -53,8 +61,19 @@ SerialWidget::SerialWidget(QWidget *parent) : QWidget(parent)
     DatabitsLabel = new QLabel(tr("数据位"));
     ParityLabel = new QLabel(tr("校验位"));
 
+    //LineEdit
+    QDoubleValidator *validator = new QDoubleValidator(0, 100, 2, this);
+
+    sendArea = new QLineEdit(this);
+    sendArea->setValidator(validator);
+    sendArea->setText(tr("0"));
+
     //按钮
     OpenButton = new QPushButton(tr("打开串口"));
+    calibrationButton = new QPushButton(tr("Calibrate Mode"));
+    calibrationButton->setDisabled(true);
+    //校准
+    connect(calibrationButton, &QPushButton::clicked, this, &SerialWidget::Calibrate);
 
     //checkbox
     RTSBox = new QCheckBox(tr("RTS"));
@@ -82,7 +101,7 @@ SerialWidget::SerialWidget(QWidget *parent) : QWidget(parent)
 
     connect(OpenButton, &QPushButton::clicked, this, &SerialWidget::OpenSerial);
     connect(this, &SerialWidget::requestClose, serialController, &SerialController::closeSerial);
-
+    connect(this, &SerialWidget::sendData, serialController,&SerialController::writeData);
 
 
     //初始化布局
@@ -97,6 +116,8 @@ SerialWidget::SerialWidget(QWidget *parent) : QWidget(parent)
     leftLlayout->addRow(DatabitsLabel, DatabitsBox);
     leftLlayout->addRow(ParityLabel, ParityBox);
     leftLlayout->addRow(COMLabel, COMBox);
+    leftLlayout->addRow(sendArea);
+    leftLlayout->addRow(calibrationButton);
     leftLlayout->addRow(OpenButton);
     leftLlayout->setAlignment(OpenButton, Qt::AlignVCenter);
     leftLlayout->setMargin(30);
@@ -149,6 +170,8 @@ SerialWidget::SerialWidget(QWidget *parent) : QWidget(parent)
     connect(this, &SerialWidget::changeRTS, serialController, &SerialController::contrloRTS);
     connect(this, &SerialWidget::changeDTR, serialController, &SerialController::controlDTR);
 
+    connect(this, &SerialWidget::sendSoundSpeed, radar, &Radar::setSoundSpeed);
+    connect(this, &SerialWidget::sendSoundSpeed, wave, &Waveform::setSoundSpeed);
 
 
 }
@@ -197,7 +220,8 @@ void SerialWidget::CheckSerials()
 
 SerialWidget::~SerialWidget()
 {
-    SerialThr.exit();
+    SerialThr.terminate();
+    radar->close();
 }
 
 
@@ -217,10 +241,12 @@ void SerialWidget::serialNotOpened()
 
 void SerialWidget::serialClosed()
 {
-
+    isOpened = false;
+    //相应控件可用性做出改变(setDisabled)
+    ACtionAttachToSerial(false);
 }
 
-void SerialWidget::getRecv(double ang, double dis)
+void SerialWidget::getRecv(int ang, int dis)
 {
     emit deliverPos(ang, dis);
 }
@@ -241,6 +267,18 @@ void SerialWidget::CloseSerial()
 
 }
 
+void SerialWidget::Calibrate()
+{
+    if(calibrationButton->text()==tr("Calibrate Mode")){
+        emit sendData(tr("S"));
+        calibrationButton->setText(tr("Confirm"));
+    } else{
+        emit sendData(tr("R"));
+        calibrationButton->setText(tr("Calibrate Mode"));
+        emit sendSoundSpeed(sendArea->text().toDouble());
+    }
+}
+
 void SerialWidget::ACtionAttachToSerial(bool set)
 {
     //根据串口开关状态决定一些控件的可用性
@@ -251,6 +289,7 @@ void SerialWidget::ACtionAttachToSerial(bool set)
         //SendButton->setDisabled(false);
         disconnect(OpenButton, &QPushButton::clicked, this, &SerialWidget::OpenSerial);
         connect(OpenButton, &QPushButton::clicked, this, &SerialWidget::CloseSerial);
+        calibrationButton->setDisabled(false);
     }
     else
     {
@@ -259,5 +298,6 @@ void SerialWidget::ACtionAttachToSerial(bool set)
         //SendButton->setDisabled(true);
         disconnect(OpenButton, &QPushButton::clicked, this, &SerialWidget::CloseSerial);
         connect(OpenButton, &QPushButton::clicked, this, &SerialWidget::OpenSerial);
+        calibrationButton->setDisabled(true);
     }
 }
