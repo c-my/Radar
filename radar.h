@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QPainter>
 #include <QPaintEvent>
-#include <QPalette>parent
+#include <QPalette>
 #include <QtMath>
 #include <QTimer>
 #include <QVector>
