@@ -92,8 +92,10 @@ void SerialController::handleRecv()
     try {
         qDebug()<<str;
         QStringList sl = str.split("|");
+        if (sl.size() == 2) {
         a = sl[0].toInt();
         d = sl[1].toInt();
+        }
         qDebug()<<a<<","<<d;
         emit sendPos(a, d);
     } catch(...) {
